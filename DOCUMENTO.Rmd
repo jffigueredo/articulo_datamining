@@ -1,0 +1,190 @@
+---
+title: "caratula"
+author: "Jan Franco Figueredo Roncal"
+date: "2024-06-18"
+output: pdf_document
+lang: es-ES
+toc: TRUE
+number_sections: TRUE
+csl: apa.csl
+bibliography: TRABAJOFINAL.bib
+---
+\pagebreak
+
+```{r libraries,cache=FALSE,include=FALSE}
+library(dplyr)
+
+```
+
+# Introduccion
+
+La sociedad en su conjunto depende de los ingresos que provienen de sus actividades,rentas , alquileres, ingresos asalariados y otros, que les brindan la oportunidad de acceder una mejor calidad de vida según su distribución de los mismos. La pobreza es un fenómeno siempre presente, en mayor o menor medida, en todas las sociedades, es constante el estudio realizado que busca entender de mejor manera este fenómeno a fin de proporcionar  herramientas de políticas para disminuir estas brechas.
+
+El estudio de la pobreza basada en ingresos es un enfoque fundamental para entender y abordar la desigualdad económica en la sociedad. La pobreza la definiremos como la falta de recursos suficientes para satisfacer una canasta básica de bienes y servicios necesarios para una vida digna, puede ser medida de diversas formas, pero el enfoque basado en ingresos es uno de los más utilizados debido a su claridad y facilidad de aplicación.
+
+Existen varios métodos para medir la pobreza, dentro los mas reconocidos a nivel internacional se encuentran el de las necesidades Básicas Insatisfechas, el de la Línea de la Pobreza y el Método Integrado, que es una combinación de los dos anteriores. 
+
+En este artículo  se estudia el método de la línea de pobreza por estar directamente relacionada con los ingresos laborales. En particular, además de contextualizar la problemática de la pobreza, se indaga la relación que tiene la pobreza monetaria con las características laborales de los miembros del hogar en Bolivia.
+
+El análisis de la pobreza, y su relación con los ingresos laborales y el trabajo, se desarrolla para la gestión 2022, haciendo uso de las Encuestas de Hogares provistas por el Instituto Nacional de Estadística de Bolivia; las cuales contienen estimaciones de las líneas de pobreza y pobreza extrema.
+
+El proceso de análisis que se realiza en la búsqueda de  patrones, correlaciones y tendencias significativas en grandes conjuntos de datos mediante el uso de técnicas de análisis estadístico, aprendizaje automático y bases de datos se denomina  minería de datos.
+
+La minería de datos tiene una variedad de métodos según el tipo de análisis que se requiera; para este estudio utilizaremos métodos de clasificación que provienen de la  analítica predictiva.
+
+Una de las herramientas más utilizadas y especializada en  este tipo de estudios estadísticos es el lenguaje R definido como un lenguaje de programación y un entorno para la informática estadística, asimismo el Rstudio es un programa que permite mejorar la interfaz del usuario de brindar herramientas que ayuden a su manejo [@TORGO2011].
+
+Este estudio se divide en 5 partes  comenzando con la recopilación de datos, en segunda el diseño de la base de datos, la  limpieza y transformación de datos, como cuarta parte el diseño del método de clasificación y finalmente  con las conclusiones de datos.
+
+
+
+# Objetivos
+
+## Objetivo Principal
+
+Analizar los factores socioeconómicos, demográficos y geográficos que contribuyen a la pobreza mediante métodos de clasificación de la minería de datos.
+
+## Objetivos específicos
+
+- Seleccionar las variables más relevantes de la encuesta hogares 2022 proporcionada por el INE.
+
+- Utilizar algoritmos de clasificación como árboles de decisión, redes neuronales, máquinas de soporte vectorial, entre otros, para segmentar la población en diferentes grupos según su nivel de pobreza.
+
+- valuar las relaciones entre los factores identificados y la pobreza, diferenciando entre correlación y causalidad.
+
+- Crear visualizaciones gráficas y mapas geográficos que representen la distribución de la pobreza y sus factores determinantes.
+
+- Validar los modelos de clasificación y predicción utilizando conjuntos de datos independiente.
+
+
+
+# Motivacion
+
+El estudio de la pobreza basada en ingresos es de suma importancia debido a su impacto en la calidad de vida y el desarrollo socioeconómico. A pesar de los numerosos estudios existentes, se busca identificar lagunas significativas en la comprensión de los factores socioeconómicos, demográficos y geográficos que contribuyen a la pobreza.
+
+Este artículo pretende abordar estas lagunas mediante la aplicación de métodos de clasificación de minería de datos, lo cual permitirá identificar patrones y tendencias que no son evidentes con análisis tradicionales. Los resultados de este estudio no solo contribuirán al conocimiento académico, sino que también proporcionarán información valiosa para la formulación de políticas más efectivas y focalizadas en la reducción de la pobreza.
+
+# Marco Teorico / Revision de literatura
+
+## La Pobreza
+
+La pobreza se define como una  exclusión derivada de la falta de los recursos requeridos para acceder a las condiciones materiales de existencia de una sociedad según su configuración histórica. Lo que se considera necesario es, a la vez, el núcleo de privación de cuya satisfacción depende la subsistencia y el conjunto de necesidades que aluden a la dignidad e igualdad del ser humano dotado de capacidades para integrarse a la sociedad  [@Direccion_de_la_provincia_de_Buenos_Aires2010].
+
+Desde fines del siglo XIX, la visión de la pobreza ha fluctuado en torno a tres conceptos. En primer lugar, está la idea de subsistencia que concibe como pobres a las familias que no obtienen el mínimo necesario para mantener tan solo la capacidad física de supervivencia del individuo. En los años setenta, la definición de pobreza desde la perspectiva de subsistencia comenzó a ser cuestionada por limitar las necesidades humanas a necesidades físicas antes que sociales. Segundo, en este contexto, comenzó a influir la noción de necesidades básicas en la definición de pobreza. Las necesidades básicas suponen una extensión de la idea de subsistencia, al considerar dos componentes: i) requerimientos mínimos de una familia para consumo privado (alimentos, techo, abrigo, ciertos muebles y equipamiento doméstico), y ii) servicios comunitarios esenciales, como agua potable, saneamiento, transporte público, salud, educación e infraestructura cultural. [@Stezano2021].
+
+Finalmente, en la última parte del siglo XX, las ciencias sociales generan una nueva formulación del significado de pobreza: el de privación relativa. La relatividad se refiere aquí a los recursos y a las condiciones sociales y materiales, y atiende al fenómeno de creciente dinamismo de las sociedades modernas. Este fenómeno hace inconducente el limitarse a estándares de pobreza estáticos previamente establecidos De este modo, mientras que la noción de pobreza absoluta marca una línea mínima requerida para la subsistencia, la idea de la pobreza relativa muestra que las necesidades de vida son fluctuantes, no fijas, se adaptan conforme a los procesos de transformación de la sociedad [@Townsend2007].
+
+## Dos enfoques sobre la pobreza: pobreza absoluta y pobreza relativa
+
+El enfoque de la pobreza absoluta parte del supuesto de que las necesidades son independientes de la riqueza de los demás y el que no sean satisfechas revela una condición de pobreza en cualquier contexto. La pobreza absoluta se define sin referencia al contexto social o las normas, sino en términos de necesidades físicas simples de subsistencia, no sociales [@Spicker2007]. En contraste, la visión de pobreza relativa supone que las necesidades surgen desde la comparación con los demás y que la pobreza depende del nivel general o promedio de riqueza [@Feres2001]. El concepto de pobreza relativa la define en términos de su relación con los estándares que existen en la sociedad. Esto solía entenderse principalmente en términos de desigualdad [@Spicker2007], como un estándar que se aplica al segmento inferior de la distribución de ingreso [@Roach1972].
+
+La pobreza relativa tiene dos elementos constitutivos definitorios. El primero alude a su definición social. @Townsend2007 define la pobreza como una forma de privación relativa, es decir, como la insuficiencia o carestía (no como ausencia) en las dietas, servicios, normas y actividades comunes en la sociedad. De modo que, en tanto la pobreza depende de la riqueza general y esta no es constante en el tiempo, el estándar para identificar a los pobres requiere definirse según cierto nivel de ingreso  [@Boltvinik2020]. 
+
+Desde una perspectiva histórica, la pobreza ha sido relacionada con el ingreso, noción que ha permanecido en el centro del significado del concepto. Sin embargo, la delimitación y medición precisa del ingreso es compleja. Cuando las personas carecen del ingreso y otros recursos para lograr las condiciones de vida que les permiten desempeñar sus papeles e involucrarse en relaciones conforme a papeles y estatus socialmente reconocidos, pueden reconocerse en una situación de pobreza [@Townsend2007,@Nolan2011]. El segundo elemento constitutivo de la pobreza relativa es el uso de métodos comparativos, es decir, se disciernen las condiciones de pobreza al contrastar entre los pobres y los miembros de la sociedad que no son pobres. Esto identifica la pobreza con desventajas y también con la desigualdad, de forma que una persona se define como pobre en relación con determinada situación de desventaja económica y social con respecto al resto de personas de su entorno. Esta concepción de la pobreza lleva a entender que la diferencia entre pobres y no pobres depende del nivel de desarrollo de la sociedad específica analizada y no puede trasladarse a otra diferente [@INE2005].
+
+## Medición de la pobreza centrada en la riqueza 
+
+La medición de la pobreza considerada solo a partir del nivel individual de ingreso económico inhibe cualquier perspectiva comparada en el análisis de la pobreza (Sen, 2006). En este sentido, crece la importancia de hacer mediciones sensibles a particiones grupales [@Zhang2001,@Duclos2004]. 
+
+La visión económica ha marcado al ingreso como el indicador central de bienestar y, por ende, ha situado a las políticas públicas de fortalecimiento del ingreso como el punto clave de cualquier política para reducir pobreza y desigualdad: el paradigma de la pobreza de ingreso [@Bourguignon2006,@Ravallion2003]. El índice de desarrollo humano (IDH), por su parte, reconoce la necesidad de incluir variables complementarias al ingreso, por lo que es una suma ponderada de tres componentes (ingresos, alfabetización y esperanza de vida), que evalúa el nivel de vida de los individuos y las poblaciones de manera explícitamente multidimensional. Esto ha representado importantes avances, pero también dilemas conceptuales no resueltos: ¿qué significan movimientos en dirección contraria de estos tres componentes y cómo agregarlos? [@Arcelus2006].
+
+## El método de la linea de Pobreza (LP)
+
+La línea de pobreza representa un valor monetario en que se consideran dos componentes: el costo de adquirir una canasta básica de alimentos y el costo de los demás bienes y servicios, expresado sobre la base de la relación entre el gasto total y el gasto en alimentos.[@CEPAL2018] 
+
+La línea de pobreza basada en la canasta de alimentos se denomina habitualmente “absoluta”, en contraposición a las líneas de “pobreza relativa”, puesto que se construye a partir de los requerimientos calóricos y nutricionales que aseguran un adecuado funcionamiento físico de la persona. A su vez, la determinación de la línea de pobreza sobre la base del comportamiento de un grupo de referencia introduce un criterio de adecuación al nivel de vida que existe en cada país y época. En consecuencia, la línea de pobreza definida de esta manera incluye implícitamente el costo de bienes y servicios necesarios para atender a los requerimientos de participación social. Debido a esta característica del método, es necesario que las líneas de pobreza sean sometidas a actualizaciones con el fin de adaptarlas a los cambios en el nivel de desarrollo, los hábitos de consumo y el sistema de precios.[@CEPAL2018]
+
+
+El ingreso total del hogar se define entonces como la suma del ingreso primario y las transferencias corrientes.
+
+## Mineria de Datos
+
+La minería de datos, también denominada descubrimiento de conocimiento en datos (KDD, por sus siglas en inglés), es el proceso de descubrir patrones y otra información valiosa en grandes conjuntos de datos. Dada la evolución de la tecnología de depósito de datos y el crecimiento de los big data, la adopción de técnicas de minería de datos se ha acelerado rápidamente en las últimas dos décadas, y las empresas las utilizan para transformar sus datos sin procesar en conocimiento útil. Sin embargo, a pesar de que la evolución continua de dicha tecnología permite tratar los datos a gran escala, su escalabilidad y automatización todavía suponen un reto para los líderes.[@IBM2024]
+
+La minería de datos mejora la toma de decisiones organizativas y ejecutivas a traves del análisis de datos. Las técnicas de minería de datos  estan basados en dos principales funciones una de ellas se relaciona a la clasificaciono agrupamiento de datos y la otra al que llamamos aprendisaje automatico o Machine Lerning. Estos métodos se utilizan para poder organizar y filtrar los datos, buscando revelar informacion que no se ve a simple vista, buscar patrones inusuales que permiten realizar diversos analisis para la toma de decisiones.
+
+Es importante mencionar que debe existir resultados graficos o visualizaciones que permitan entender los resultados de los analisis realizados.
+
+## Proceso de minería de datos
+
+El proceso de minería de datos consiste en una serie de pasos que incicia en la recopilacion de información su proceso de analisis entregar gráficos de visualizacion, que nos proporciona resumenes de sociedad de datos. Como ya hemos mencionado, las técnicas de minería de datos se utilizan para generar descripciones y previsiones sobre un conjunto de datos de destino. Los científicos de datos describen los datos mediante la observación de patrones, asociaciones y correlaciones. Así mismo, clasifican y agrupan en clúster los datos por medio de métodos de clasificación y regresión, e identifican valores atípicos para los casos de uso, como la detección de correo no deseado.[@IBM2024]
+
+El proceso de mineria de datos según @IBM2024 de define en cuatro pasos.
+
+1. Definir los objetivos de negocio: Este proceso es de suma importacion debido a que enfoca el estudio y se pretende obtener informacion que permita mejorar el funcionamiento de la empresa en cuestion.
+
+2. Preparar los datos: una vez definido el alcance del problema o la estrategia, es más sencillo identificar qué conjunto de datos ayudará a dar respuesta a las preguntas u objetivos planteados por la empresa. Una vez que recopilan los datos relevantes, estos sufren un proceso de limpiesa para eliminar lo que no sirve, como los duplicados, los valores que faltan y los valores atípicos. Los científicos de datos intentan retener los predictores más importantes para garantizar la precisión óptima dentro de cualquier modelo.
+
+3. Crear modelos y realizar minería de patrones: en función del tipo de análisis que se desea realizar, se debe investigar las relaciones de datos que sean de interés, como los patrones secuenciales, las reglas de asociación o las correlaciones. 
+
+4. Evaluación de resultados e implementación de conocimientos: una vez agregados los datos, los resultados deben evaluarse e interpretarse. Para finalizar los resultados, estos deben ser válidos, útiles y comprensibles. Cuando se cumplen estos criterios, las organizaciones pueden utilizar este conocimiento para implementar nuevas estrategias y lograr los objetivos previstos.[@IBM2024].
+
+## Técnicas de minería de datos
+
+La minería de datos funciona utilizando diversos algoritmos y técnicas para transformar grandes volúmenes de datos en información útil. Estos son algunos de los más habituales:
+
+Reglas de asociación: una regla de asociación es un método basado en reglas para detectar relaciones entre variables en un conjunto de datos determinado. Estos métodos se utilizan con frecuencia para los análisis de cesta de la compra, que permiten a las empresas comprender mejor las relaciones entre los diferentes productos. Entender los hábitos de consumo de los clientes permite a las empresas desarrollar mejores estrategias de venta cruzada y motores de recomendaciones.
+
+Redes neuronales: las redes neuronales, que se utilizan principalmente para los algoritmos de deep learning, procesan los datos de entrenamiento imitando la interconectividad del cerebro humano a través de capas de nodos. Cada nodo está formado por entradas, ponderaciones, un sesgo (o umbral) y una salida. Si ese valor de salida excede un umbral determinado, "dispara" o activa el nodo, pasando datos a la siguiente capa de la red. Las redes neuronales aprenden esta función de correlación a través del aprendizaje supervisado y se ajustan con base en la función de pérdida, a través del proceso de pendiente de gradiente. Cuando la función de coste es igual o casi igual a cero, podemos confiar en la precisión del modelo para obtener la respuesta correcta.[@IBM]
+
+Árbol de decisiones: esta técnica de minería de datos utiliza métodos de clasificación o regresión para clasificar o prever resultados potenciales en función de una serie de decisiones. Como su propio nombre indica, utiliza una visualización en forma de árbol para representar los posibles resultados de estas decisiones.
+
+K vecino más cercano (KNN): el algoritmo K vecino más cercano, que también se denomina algoritmo KNN, es un algoritmo no paramétrico que clasifica los puntos de datos en función de su proximidad y asociación con otros datos disponibles. Este algoritmo presupone que los puntos de datos similares se encuentran cerca unos de otros. En consecuencia, busca la distancia entre puntos de datos, generalmente mediante distancia euclídea, y luego asigna una categoría basada en el promedio o la categoría más frecuente.
+
+# Aplicaciones de la minería de datos
+
+Las técnicas de minería de datos gozan de una amplia adopción entre los equipos de inteligencia empresarial y de analítica de datos, y les permiten extraer conocimientos para su organización y sector. 
+
+Los campos mas utilizados son Ventas y marketing, Educación, Detección de fraude y otros.
+ 
+
+# Descripcion de la base de datos 
+
+La base de datos fue descargada del portal del Instituto Nacional de Estadistica de Bolivia, la misma corresponde a la encuesta hogares de la gestion 2022.
+
+Asi tambien se descargó un archivo y se convirtio en una base para registro de actividades economicos.
+
+
+
+# Metodología
+
+En cuanto se refiere a la metodología citar:
+
+## Recopilacion de datos: 
+
+Fuentes de Datos: Se utilizaron datos de encuestas de hogares 2022 realizada por el Instituto Nacional de Estadística de Bolivia.
+
+Periodo: El análisis abarcó datos utilizados es de la gestión 2022, se toma un periodo en específicos siendo que se pretende realizar el estudio de indicadores y no su evolución en el tiempo.
+
+## Definición de Pobreza por Ingresos:
+
+Umbral de Pobreza: Se establecieron umbrales de pobreza basados en el costo de una canasta básica de alimentos y otros bienes y servicios esenciales. Este umbral varía según el país y la región debido a las diferencias en el costo de vida.
+
+Pobreza o No Pobre: Se diferenciaron dos niveles de pobreza: pobre , definida como ingresos insuficientes para cubrir únicamente la canasta básica de alimentos, y No pobre, que incluye además otros bienes y servicios esenciales.
+
+## Procesamiento de Datos:
+
+Limpieza y Normalización: Los datos se limpiaron para eliminar inconsistencias y se normalizaron para asegurar la comparabilidad entre diferentes departamentos y áreas, además que se creó variables que identifiquen el tipo de actividad que pertenecen.
+
+Imputación de Datos Faltantes: Se aplico la técnica de imputación Listwise deletion que consiste en una técnica fácil de implementar y entender, ya que simplemente elimina los registros incompletos y garantiza que el análisis se realice siempre con los mismos datos completos, lo que puede facilitar la interpretación y la comparación de resultados.
+
+## Métodos de Análisis:
+
+Estadísticas Descriptivas: Se realizaron análisis descriptivos para entender la distribución de ingresos y la incidencia de la pobreza en diferentes grupos demográficos.
+
+Regresión Logística: Se utilizó la regresión logística para identificar los factores socioeconómicos y demográficos que tienen una relación significativa con la probabilidad de estar en situación de pobreza.
+
+## Validación del modelo de Clasificacion:
+
+Entrenamiento y Prueba: Divide el conjunto de datos en un conjunto de entrenamiento (usualmente 70%) y un conjunto de prueba (30%). El modelo se entrena en el conjunto de entrenamiento y se evalúa en el conjunto de prueba..
+
+## Presentación de Resultados:
+
+Tablas y Gráficos: Los resultados se presentaron mediante tablas y gráficos detallados que ilustran la incidencia de la pobreza y las brechas de ingresos.
+
+
+# Resultados y análisis
+
+# Conclusiones y recomendaciones
+
+# Referencias

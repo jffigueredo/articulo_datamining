@@ -1,0 +1,58 @@
+---
+title: "trabajo final"
+author: "Jan Franco Figueredo Roncal"
+date: "2024-06-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Cargamos la base de datos 
+```{r}
+library(dplyr)
+library(utils)
+library(haven)
+library(forcats)
+library(readxl)
+load("eh22.Rdata")
+base_caeb <- readxl::read_excel("CLASIF_ACTI_ECON_BOLIVIA.xls",sheet = 5)
+persona <- eh22p
+persona$s04b_12 <- as.factor(persona$s04b_12)
+
+#clasificar las actividades como dependiente e independiente
+personas <- persona %>% select     (folio,depto,area,s01a_05, s04b_11aa,s04b_11ba,s04b_12,ylab,subClase = s04b_10a_cod) %>% filter((s04b_12 == "1" | s04b_12 == "3")&(s01a_05==1))
+personas <- personas %>%
+  mutate(tipoAct = fct_recode(s04b_12,
+                              Dependiente = "1",
+                              Independiente = "3")) %>% select(-s04b_12)
+left_join_result <- left_join(personas, base_caeb, by = "subClase")
+#left_join_result <- na.omit(left_join_result)
+left_join_result %>% select(subClase,descripcion) %>% group_by(subClase) %>% summarise()
+unique(left_join_result$descripcion)
+
+
+row25 <- left_join_result %>%select(subClase,descripcion) %>%  filter(is.na(descripcion)) %>% arrange(subClase) %>% group_by(subClase) %>% summarise(n())
+row25$subClase <- as.character(row25$subClase)
+write.csv(row25,file = "caeb",sep = " ")
+#codificando el tipo de actividad
+persona <- persona %>%
+  mutate(tipoAct = fct_recode(s04b_12,
+                              Dependiente = "1",
+                              Independiente = "3")) %>% select(-s04b_12)
+
+#nombres 
+left_join_result <- left_join(personas, base_caeb, by = "subClase")
+left_join_result <- na.omit(left_join_result)
+
+str(persona$s04b_12)
+str(persona$folio)
+
+```
+
+```{r}
+persona %>% select (folio,ylab,ynolab,yper,yhog,s01a_03) %>% filter(folio == "111-000043-A-0031")
+head(persona$folio,5)
+
+```
+

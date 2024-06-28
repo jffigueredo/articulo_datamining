@@ -1,0 +1,17 @@
+---
+title: "trabajo_final"
+author: "Jan Franco Figueredo Roncal"
+date: "2024-06-18"
+output: html_document
+bibliography: referncias.bib
+csl: nature.csl
+---
+```{r eval=TRUE}
+
+```
+el primer libro consultado es [@peng2024generalized], despues segunda cita @peng2024generalized y año [-@peng2024generalized] solamente.
+
+```{r echo=FALSE}
+ceo <- 0.01 # imprimiendo un valor de una variable
+```
+was `r ceo` 

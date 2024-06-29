@@ -1,5 +1,5 @@
 ---
-title: "caratula"
+title: "Estudio de la pobreza basada en Ingresos de la encuesta hogares 2022 de INE Bolivia"
 author: "Jan Franco Figueredo Roncal"
 date: "2024-06-18"
 output: pdf_document
@@ -16,7 +16,7 @@ library(dplyr)
 
 ```
 
-# Introduccion
+# Introducción
 
 La sociedad en su conjunto depende de los ingresos que provienen de sus actividades,rentas , alquileres, ingresos asalariados y otros, que les brindan la oportunidad de acceder una mejor calidad de vida según su distribución de los mismos. La pobreza es un fenómeno siempre presente, en mayor o menor medida, en todas las sociedades, es constante el estudio realizado que busca entender de mejor manera este fenómeno a fin de proporcionar  herramientas de políticas para disminuir estas brechas.
 
@@ -58,13 +58,13 @@ Analizar los factores socioeconómicos, demográficos y geográficos que contrib
 
 
 
-# Motivacion
+# Motivación
 
 El estudio de la pobreza basada en ingresos es de suma importancia debido a su impacto en la calidad de vida y el desarrollo socioeconómico. A pesar de los numerosos estudios existentes, se busca identificar lagunas significativas en la comprensión de los factores socioeconómicos, demográficos y geográficos que contribuyen a la pobreza.
 
 Este artículo pretende abordar estas lagunas mediante la aplicación de métodos de clasificación de minería de datos, lo cual permitirá identificar patrones y tendencias que no son evidentes con análisis tradicionales. Los resultados de este estudio no solo contribuirán al conocimiento académico, sino que también proporcionarán información valiosa para la formulación de políticas más efectivas y focalizadas en la reducción de la pobreza.
 
-# Marco Teorico / Revision de literatura
+# Marco Teórico 
 
 ## La Pobreza
 
@@ -144,7 +144,7 @@ La base de datos fue descargada del portal del Instituto Nacional de Estadistica
 
 Asi tambien se descargó un archivo y se convirtio en una base para registro de actividades economicos.
 
-
+Se utiliza los archivos pobre=p0,folio,depto, area,jefe=s01a_05,aestudio,yhog,antNeg=s04b_11aa,tipoAct=s04b_12,caeb_op de la base personas eh22p y de la base equipamiento eh22e.
 
 # Metodología
 
@@ -182,9 +182,144 @@ Entrenamiento y Prueba: Divide el conjunto de datos en un conjunto de entrenamie
 
 Tablas y Gráficos: Los resultados se presentaron mediante tablas y gráficos detallados que ilustran la incidencia de la pobreza y las brechas de ingresos.
 
+#Analisis
+Para realizar la mineria de datos como se indicó anteriormente se realiza el procesamiento en bruto de las bases ah22p y ah22e, como se muesra a continuacion:
 
-# Resultados y análisis
+```{r include=FALSE}
+library(dplyr)
+library(utils)
+library(haven)
+library(forcats)
+library(readxl)
+library(labelled)
+library(caret)
+library(mice)
+library(mfx)
+rm(list = ls())
+load("test_eh22.RData")
+
+```
+
+
+```{r eval=FALSE}
+load("eh22.Rdata")
+Seleccion de los datos a utilizar.
+Utilizaremos la base eh22p, e22e, para este estudio.
+persona <- eh22p
+persona$s04b_12 <- as.factor(persona$s04b_12)
+
+personas <- persona %>% dplyr::select(pobre=p0,folio,depto,area,jefe=s01a_05,aestudio,
+              yhog,antNeg=s04b_11aa,tipoAct=s04b_12,caeb_op)
+personas <- personas%>% filter((jefe==1))
+personas$tipoAct <- as.factor(personas$tipoAct)
+personas <- personas %>%dplyr::filter((tipoAct == "1" | tipoAct == "3"))
+```
+
+```{r}
+head(personas,5)
+```
+
+
+```{r eval=FALSE}
+
+Se busca incluir a los gastos de equipamiento.
+
+bdequi <- eh22e %>% dplyr::select(folio,s08b_4) %>% 
+  dplyr::group_by(folio)%>% summarise(equi_hogar=sum(s08b_4,na.rm = TRUE))
+aux <- left_join(personas, bdequi, by = "folio")
+
+
+
+Se crea la base de enrenamiento y prueba.
+
+set.seed(605)
+aux<-createDataPartition(bd$pobre, p=0.7 , list = F)
+bdtrain<-bd[aux,]
+bdtest<-bd[-aux,]
+
+```
+
+Verificando  existencia de datos vacios.
+
+```{r}
+md.pattern(aux)
+```
+Eliminando los datos
+
+```{r eval=FALSE}
+bd <- na.omit(aux)
+bd<-bd %>% dplyr::select(-folio, -jefe) %>% to_factor()
+bd<-bd %>% mutate(pobre=(pobre=="Pobre"))
+
+```
+
+
+1. Se aplicara los modelos logit/probit
+```{r warning = FALSE}
+m1<-glm(pobre ~ . , data=bdtrain, family = binomial(link="logit"))
+m2<-glm(pobre ~ . , data=bdtrain, family = binomial(link="probit"))
+```
+
+2.  Identificar las variables significativas
+
+```{r warning = FALSE,eval=FALSE}
+step(m1)
+step(m2)
+```
+
+3.  Construir el modelo con variables significativas (evitar colinealidad alta)
+```{r warning = FALSE}
+m3<-step(m1)
+m4<-step(m2)
+
+```
+
+4.  Predecir la clase de pertenencia en la base de test ($prob>0.5$)
+
+```{r warning = FALSE}
+prob_l<-predict(m3, bdtest, type="response")
+prob_p<-predict(m4, bdtest, type="response")
+
+```
+
+5.  Comparar lo observado y lo predicho
+
+```{r warning = FALSE}
+bdtest<-bdtest %>% mutate(yl=(prob_l >0.5),
+                  yp=(prob_p >0.5))
+
+```
+
+6.  Generar la matriz de confusión
+
+```{r warning = FALSE}
+tl<-table(bdtest$pobre, bdtest$yl)
+tp<-table(bdtest$pobre, bdtest$yp)
+confusionMatrix(tl)
+confusionMatrix(tp)
+
+```
+En las tablas se pueden evidenciar que existe una diferencia nada significativa en comparacion de los modelo:
+- el modelo logit nos muestra una acuracidad de  0.7923.
+- el modelo probit nos resulta 0.7915
+
+7.  Efectos marginales
+```{r warning = FALSE, eval=FALSE}
+logitmfx(pobre ~ . , data=bdtrain)
+probitmfx(pobre ~ . , data=bdtrain)
+
+```
+
+
 
 # Conclusiones y recomendaciones
+
+La mineria de datos puede identificar los factores que más contribuyen a la pobreza, como el nivel educativo, el acceso a compras de archivos y otros, la infraestructura, el desempleo, y la composición del hogar. Estos factores pueden variar según la región y el contexto.
+
+En este articulo se buscó construir modelos probit y logit que permitan definir si son pobres o no mediante datos como los ingresos, equipamiento del hogar, años de estudio, departamento, area donde viven, se muestra más el manejo de herramientas de mineria de datos.
+
+Estas conclusiones permiten a los formuladores de políticas y a los actores sociales comprender mejor la naturaleza de la pobreza en una región y tomar medidas informadas para reducirla y mejorar la calidad de vida de la población afectada.
+
+Dentro las recomendaciones estan un estudio mas detallado y la apliación de otras herramientas que permitan identificas grupos con caracteristicas similares.
 
 # Referencias

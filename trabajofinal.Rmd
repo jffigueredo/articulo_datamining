@@ -1,24 +1,14 @@
 ---
-title: "trabajo final"
+title: "trabajo"
 author: "Jan Franco Figueredo Roncal"
-date: "2024-06-25"
+date: "2024-06-29"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-Para realizar la construcción el modelo promero cargaremos las siguientes librerias y el archivo "eh22.Rdata":
-        library(dplyr)
-        library(utils)
-        library(haven)
-        library(forcats)
-        library(readxl)
-        library(labelled)
-        library(caret)
-        library(mice)
-        library(pROC)
-        library(mfx)
+
 ```{r}
 library(dplyr)
 library(utils)
@@ -31,20 +21,17 @@ library(mice)
 library(mfx)
 rm(list = ls())
 load("eh22.Rdata")
+persona <- eh22p
+
 ## Seleccion de los datos a utilizar.
 #Utilizaremos la base eh22p, e22e, para este estudio.
-persona <- eh22p
-#persona$s04b_12 <- as.factor(persona$s04b_12)
+persona$s04b_12 <- as.factor(persona$s04b_12)
 
-personas <- persona %>% dplyr::select(pobre=p0,folio,depto,area,jefe=s01a_05,aestudio,yhog,antNeg=s04b_11aa,tipoAct=s04b_12,caeb_op)
-personas <- personas%>% filter((jefe==1))
-personas$tipoAct <- as.factor(personas$tipoAct)
-personas <- personas %>%dplyr::filter((tipoAct == "1" | tipoAct == "3"))
+personas <- persona %>% select     (pobre=p0,folio,depto,area,jefe = s01a_05,aestudio,yhog, antNeg= s04b_11aa,tipoAct=s04b_12,caeb_op)%>% filter((jefe==1)& (tipoAct == "1" | tipoAct == "3"))
 head(personas,5)
-
 #Se busca incluir a los gastos de equipamiento.
 
-bdequi <- eh22e %>% dplyr::select(folio,s08b_4) %>% dplyr::group_by(folio)%>% summarise(equi_hogar=sum(s08b_4,na.rm = TRUE))
+bdequi <- eh22e %>% select(folio,s08b_4) %>% group_by(folio)%>% summarise(equi_hogar=sum(s08b_4,na.rm = TRUE))
 
 aux <- left_join(personas, bdequi, by = "folio")
 md.pattern(aux)
@@ -52,7 +39,7 @@ md.pattern(aux)
 #Verificando  existencia de datos vacios.
 
 bd <- na.omit(aux)
-bd<-bd %>% dplyr::select(-folio, -jefe) %>% to_factor()
+bd<-bd %>% select(-folio, -jefe) %>% to_factor()
 bd<-bd %>% mutate(pobre=(pobre=="Pobre"))
 
 
@@ -102,5 +89,3 @@ confusionMatrix(tp)
 #7.  Efectos marginales
 logitmfx(pobre ~ . , data=bdtrain)
 probitmfx(pobre ~ . , data=bdtrain)
-```
-
